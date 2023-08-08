@@ -554,8 +554,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     dataReceived = true;
     while (huart->RxState != HAL_UART_STATE_READY) { }
     HAL_UART_Receive_IT(huart, rxBuffer, 1);
-    commandBuffer[charCount] = rxBuffer[0];
-    charCount += 1;
     if (rxBuffer[0] == endLine[0]) {
     	processCommand((char*)commandBuffer, 100);
 
@@ -566,6 +564,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     	while (huart->gState != HAL_UART_STATE_READY) { }
     	HAL_UART_Transmit(huart, (uint8_t *)newline, sizeof(newline)-1, DEFAULT_TIMEOUT);
     }
+    else {
+    	commandBuffer[charCount] = rxBuffer[0];
+    	charCount += 1;
+    }
+
     if (dataTransmitted) {
     	while (huart->gState != HAL_UART_STATE_READY) { }
     	HAL_UART_Transmit_IT(huart, rxBuffer, 1);
