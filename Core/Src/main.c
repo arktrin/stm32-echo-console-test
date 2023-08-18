@@ -55,6 +55,9 @@ SPI_HandleTypeDef hspi2;
 
 /* USER CODE BEGIN PV */
 
+uint8_t port[] = "\0";
+uint8_t pinnum[] = "\0";
+
 uint8_t newline[] = "\n\r";
 uint8_t endLine[] = "\r";
 
@@ -66,7 +69,7 @@ uint8_t commandBuffer[64];
 uint8_t charCount; // for commandBuffer
 
 enum Command {NoCommand = 0, WriteFPGA, WriteFlash, ReadFlash, ReadI2C, WriteI2C, ReadSPI, WriteSPI,
-	          Rubidium, PrintOffset, NmeaPrint, Info, Tie} command = NoCommand;
+	          ReadPin, WritePin, Info} command = NoCommand;
 
 int32_t fpgaDataSize = 0;
 uint32_t flashDataSize = 0;
@@ -100,6 +103,8 @@ void processCommand(char *buf, uint32_t len)
 	static const char writeI2C[] = "i2cset";
 	static const char readSPI[] = "spiget";
 	static const char writeSPI[] = "spiset";
+	static const char readPin[] = "readpin";
+	static const char writePin[] = "writepin";
 	static const char nmeaCmd[] = "nmea";
 	static const char infoCmd[] = "info";
 	static const char stopCmd[] = "stop";
@@ -141,6 +146,7 @@ void processCommand(char *buf, uint32_t len)
 	// write FPGA from PC command
 	else if (strcmp(s, fpgaCmd) == 0)
 	{
+    command = WriteFPGA;
 //		s = strtok(0, " ");
 //		if (s)
 //		{
@@ -225,6 +231,37 @@ void processCommand(char *buf, uint32_t len)
 			}
 		}
 	}
+	// read pin state command
+	else if (strcmp(s, readPin) == 0)
+	{
+		s = strtok(0, " ");
+		if (s)
+		{
+			command = ReadPin;
+      port[0] = s[1];
+      pinnum[0] = s[2];
+      if (port[0] == 'A')
+      {
+        HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+      }
+		}
+	}
+	// write pin value command
+	else if (strcmp(s, writePin) == 0)
+	{
+		s = strtok(0, " ");
+		if (s)
+		{
+			command = WritePin;
+      port[0] = s[1];
+      pinnum[0] = s[2];
+      if (port[0] == 'A')
+      {
+        HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+      }
+		}
+	}
+
 	// read nmea command
 	else if (strcmp(s, nmeaCmd) == 0)
 	{
@@ -317,7 +354,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+	  // HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	  HAL_Delay(500);
   }
   /* USER CODE END 3 */

@@ -16,8 +16,6 @@ void uartRequestData(Uart uart);
 void setUartCommand(Uart uart, const char *str);
 void uartSendCommand(Uart uart);
 void uartSendIt(Uart uart, const char *str);
-void rubidiumDiscipline(int val);
-void initRubidium();
 
 #define BUF_SIZE 4096
 #define HALF_SIZE  BUF_SIZE / 2
